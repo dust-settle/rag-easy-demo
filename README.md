@@ -33,7 +33,7 @@
 ```
 rag-easy-demo/               ← 仓库根（.git 在这一层）
 ├── README.md               ← 本文件
-├── src/                    ← 8 个 Python 源码（核心代码）
+├── src/                    ← 7 个 Python 源码（核心代码）
 ├── data/                   ← 原始知识资料（要传 GitHub）
 ├── runtime/                ← 运行时数据（向量库等，不传 GitHub）
 ├── .env                    ← API 密钥（绝不传 GitHub，已加入 .gitignore）
