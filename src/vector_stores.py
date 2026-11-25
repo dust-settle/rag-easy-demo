@@ -16,7 +16,8 @@ class VectorStoreService(object):
         )
     # 返回向量检索器
     def get_retriever(self):
-        return self.vector_store.as_retriever(search_kwargs = {"k":config.similarity_threshold})
+        # v1.1：粗召回 retrieve_k 条，真正的挑选交给后面的 Reranker
+        return self.vector_store.as_retriever(search_kwargs = {"k": config.retrieve_k})
 
 
 

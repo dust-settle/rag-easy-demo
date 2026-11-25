@@ -184,7 +184,7 @@ def verify(question="这款牛奶一盒多少毫升，每100毫升蛋白质多�
     retriever = VectorStoreService(
         Mydashscopeembedding("text-embedding-v4")).get_retriever()
     docs = retriever.invoke(question)
-    print(f"\n[检索] {question!r} -> 命中 {len(docs)} 条 (k={config.similarity_threshold})")
+    print(f"\n[检索] {question!r} -> 粗召回 {len(docs)} 条 (k={config.retrieve_k}，自检不走 Rerank)")
     for i, d in enumerate(docs):
         print(f"  --- 第{i + 1}条  source={d.metadata.get('source')!r} len={len(d.page_content)}")
         print("  " + d.page_content[:300].replace("\n", " "))

@@ -6,6 +6,7 @@ from langchain_core.runnables import RunnablePassthrough, RunnableWithMessageHis
 from file_history_store import get_history
 load_dotenv()
 import os
+from dashscope import TextReRank
 from vector_stores import VectorStoreService
 from knowledge_base import Mydashscopeembedding
 import  config_data as config
@@ -41,7 +42,9 @@ class RagService(object):
                  "不得给出确定数值，要引导顾客查看商品页。\n"
                  "3. 合规红线：不承诺长高、提高免疫力、治疗疾病、防骨质疏松等功效，"
                  "不替代医生判断，1 岁以内婴儿不建议喝纯牛奶，不使用'最好/第一/唯一/绝对'等绝对化用语，"
-                 "不引导站外交易。"),
+                 "不引导站外交易。\n"
+                 "4. 在回答末尾另起一段标注'（资料来源：xxx）'，xxx 用参考资料中的来源文件名；"
+                 "如果没有参考资料，就不要编造来源。"),
                 ("system", "之前的对话历史如下:"),
                 MessagesPlaceholder("history"),
                 ("user", "请回答顾客提问:{input}")
@@ -73,6 +76,37 @@ class RagService(object):
         def formar_for_retriever(value: dict) -> str:
             return value["input"]
 
+        def retrieve_and_rerank(value) -> list:
+            """取问题 -> Chroma 粗召回 -> DashScope Reranker 精排 -> 文档列表。
+
+            v1.1 新增：粗召回 retrieve_k 条，重排后只留 rerank_top_n 条。
+            重排接口失败时自动降级为原始顺序，不让整个问答崩掉。
+            """
+            raw = value["input"]
+            # 兼容 value["input"] 是纯字符串，或经过消息历史包装后的一层 dict
+            query = raw["input"] if isinstance(raw, dict) else raw
+
+            docs = retriever.invoke(query)
+            if not docs:
+                return docs
+            try:
+                resp = TextReRank.call(
+                    model=config.rerank_model_name,
+                    query=query,
+                    documents=[d.page_content for d in docs],
+                    top_n=config.rerank_top_n,
+                    api_key=os.getenv("DASHSCOPE_API_KEY"),
+                )
+                if resp.status_code != 200:
+                    print(f"[重排] 调用失败：{resp.message}，退回原始顺序")
+                    return docs[:config.rerank_top_n]
+                # output["results"] 形如 [{"index": 2, "relevance_score": 0.9}]，已按相关度降序
+                results = resp.output["results"]
+                return [docs[item["index"]] for item in results]
+            except Exception as exc:
+                print(f"[重排] 异常：{exc}，退回原始顺序")
+                return docs[:config.rerank_top_n]
+
         def formar_for_prompt_template(value):
                 new_value = {}
                 new_value["input"] = value["input"]["input"]
@@ -83,7 +117,7 @@ class RagService(object):
         chain = (
              {
                     "input": RunnablePassthrough(),
-                    "context": RunnableLambda(formar_for_retriever) | retriever | format_document
+                    "context": RunnableLambda(retrieve_and_rerank) | format_document
              } | RunnableLambda(formar_for_prompt_template) | self.prompt_template | print_prompt | self.chat_model | StrOutputParser()
     )
 

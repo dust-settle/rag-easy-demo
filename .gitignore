@@ -1,0 +1,24 @@
+# 密钥与环境变量（含真实 API Key，绝不入库）
+.env
+.env.*
+!.env.example
+
+# Python 运行缓存
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# 虚拟环境
+.venv/
+venv/
+
+# 运行时数据：向量库、md5 记录、会话历史（体积大且可重建）
+runtime/
+
+# IDE 配置
+.idea/
+.vscode/
+
+# 系统文件
+.DS_Store
+Thumbs.db

@@ -105,7 +105,17 @@ class KnowledgeBaseService(object):
             "create_time" : datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             "operator" : "小明"
         }
-         # 将内容加载到向量库中
+
+        # v1.1 修复"旧块残留"：同名文件内容改了以后 md5 变了会重新入库，
+        # 但旧版本的块还留在库里，检索时新旧会一起被召回。
+        # 所以写新块之前，先按 source 把该文件的旧块全部删掉。
+        try:
+            self.chroma.delete(where={"source": filename})
+            print(f"[更新] 已清理 {filename} 的旧版本块")
+        except Exception as exc:
+            print(f"[警告] 清理旧块失败（不影响新块写入）: {exc}")
+
+        # 将内容加载到向量库中
         self.chroma.add_texts(
             knowledge_chunks,
             metadatas = [metadata for _ in knowledge_chunks]
