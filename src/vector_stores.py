@@ -24,7 +24,7 @@ class VectorStoreService(object):
 if __name__ == "__main__":
     retriever = VectorStoreService(Mydashscopeembedding("text-embedding-v4")).get_retriever()
 
-    res = retriever.invoke("刘维学过哪些技术？")
+    res = retriever.invoke("这款牛奶一盒多少毫升？")
 
     print(res)
 

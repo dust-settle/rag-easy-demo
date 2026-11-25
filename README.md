@@ -36,8 +36,10 @@ rag-easy-demo/               ← 仓库根（.git 在这一层）
 ├── src/                    ← 8 个 Python 源码（核心代码）
 ├── data/                   ← 原始知识资料（要传 GitHub）
 ├── runtime/                ← 运行时数据（向量库等，不传 GitHub）
-├── .env                    ← API 密钥（绝不传 GitHub）
-└── 项目结构说明.md          ← 每个文件夹/文件的详细用途
+├── .env                    ← API 密钥（绝不传 GitHub，已加入 .gitignore）
+├── .gitignore              ← 忽略规则（密钥/缓存/运行时数据）
+├── 项目结构说明.md          ← 每个文件夹/文件的详细用途
+└── ingest逐行精讲.md        ← 学习文档：逐行讲解 ingest.py
 ```
 
 每个文件具体干什么，见 [`项目结构说明.md`](项目结构说明.md)。
@@ -138,18 +140,20 @@ A：不会。它只检索本地知识库；联网只是调用阿里云接口做�
 | `.idea/`               | 编辑器个人配置           |
 | `__pycache__/`、`*.pyc` | Python 编译缓存       |
 
-建议在项目里加一个 `.gitignore` 文件，写入：
+本项目已经配置好 `.gitignore`（内容如下），并已实测 `git add -A` 不会暂存任何敏感文件；`.env` 也从未进入过提交历史：
 
 ```gitignore
 .env
-.venv/
-.idea/
+.env.*
+!.env.example
 __pycache__/
-*.pyc
+*.py[cod]
+.venv/
 runtime/
+.idea/
 ```
 
-如果 `.env` 已经被 `git add` 过，用下面的命令从暂存区移除（硬盘上的文件会保留）：
+万一 `.env` 曾被误加到暂存区，用下面的命令移除（硬盘上的文件会保留）：
 
 ```powershell
 git rm --cached .env

@@ -46,7 +46,7 @@ class Mydashscopeembedding(Embeddings):
 
     def embed_documents(self, text:list[str])->list[list[float]]:
         #  DashScope embedding 接口单次最多 10 条，超了会报 batch size invalid，
-        #  所以分批调用，每批 10 条，最后把结果拼起来（个人资料较大必须这么做）
+        #  所以分批调用，每批 10 条，最后把结果拼起来（大批量资料必须这么做）
         all_embeddings = []
         for start in range(0, len(text), 10):
             batch = text[start:start + 10]
@@ -126,7 +126,7 @@ class KnowledgeBaseService(object):
         return "[成功]内容已经成功载入向量库"
 
 if __name__ == '__main__':
-    # 单文件自测：不要直接往正式库写测试数据，避免污染个人资料库。
+    # 单文件自测：不要直接往正式库写测试数据，避免污染知识库。
     # 需要验证入库流程时，请用 data/ 下的真实资料跑 ingest.py。
     print("请用 python ingest.py 导入 data/ 下的知识库文件。")
 

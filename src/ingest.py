@@ -14,7 +14,7 @@
 可以重复执行：同一份内容不会重复入库（靠 md5.txt 去重）。
 """
 
-# 使用streamlit run D:\rag项目开始\project\src\app_qa.py启动
+# 启动前端：在 src 目录下执行 streamlit run app_qa.py
 
 import json
 import os

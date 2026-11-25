@@ -1,9 +1,7 @@
-# 基于streamlit完成WEB网页上传服务
+# 基于 Streamlit 的知识库上传页面（用 streamlit run app_file_upload.py 启动）
 import streamlit as st
 from knowledge_base import KnowledgeBaseService
 import time
-from huggingface_hub import upload_file
-# 使用streamlit run 03rag项目/data/app_file_upload.py启动
 st.title("知识库更新服务")
 
 upload_file = st.file_uploader(
