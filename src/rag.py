@@ -1,5 +1,4 @@
 from dotenv import load_dotenv
-from langchain_classic.chains.qa_generation.prompt import templ1
 from langchain_core.documents import Document
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough, RunnableWithMessageHistory, RunnableLambda
@@ -72,9 +71,6 @@ class RagService(object):
                 formatted_str += f"文档片段:{doc.page_content}\n文档元数据:{doc.metadata}\n\n"
 
             return formatted_str
-
-        def formar_for_retriever(value: dict) -> str:
-            return value["input"]
 
         def retrieve_and_rerank(value) -> list:
             """取问题 -> Chroma 粗召回 -> DashScope Reranker 精排 -> 文档列表。

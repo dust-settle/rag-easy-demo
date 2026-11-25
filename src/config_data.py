@@ -1,7 +1,5 @@
 import os
 
-from ollama import embeddings
-
 # 使用绝对路径（相对本文件），保证"入库"和"检索"永远指向同一个库。
 # 原来的 "./chroma_db" 依赖"当前工作目录"：从仓库根目录启动 streamlit 会写进
 # <根目录>/chroma_db，而在这里跑 vector_stores.py 又读 <data>/chroma_db，
